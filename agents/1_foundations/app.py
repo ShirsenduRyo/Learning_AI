@@ -76,9 +76,10 @@ tools = [{"type": "function", "function": record_user_details_json},
 class Me:
 
     def __init__(self):
-        self.openai = OpenAI()
-        self.name = "Ed Donner"
-        reader = PdfReader("me/linkedin.pdf")
+        self.google_api_key = os.getenv("GOOGLE_API_KEY")
+        self.openai = OpenAI(api_key=self.google_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+        self.name = "Shirsendu Dhar"
+        reader = PdfReader("me/linkedin_profile.pdf")
         self.linkedin = ""
         for page in reader.pages:
             text = page.extract_text()
