@@ -1,3 +1,5 @@
+# url = "https://huggingface.co/spaces/shirsendu-ryo/Career_Chat_Bot"
+
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
@@ -5,9 +7,16 @@ import os
 import requests
 from pypdf import PdfReader
 import gradio as gr
-
+import subprocess
 
 load_dotenv(override=True)
+
+token = os.getenv("HF_TOKEN")
+
+if token:
+    subprocess.run(["huggingface-cli", "login"], input=token.encode(), check=True)
+else:
+    print("HF_TOKEN not found in .env")
 
 def push(text):
     requests.post(
@@ -77,7 +86,7 @@ class Me:
 
     def __init__(self):
         self.google_api_key = os.getenv("GOOGLE_API_KEY")
-        self.openai = OpenAI(api_key=self.google_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+        self.gemini = OpenAI(api_key=self.google_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
         self.name = "Shirsendu Dhar"
         reader = PdfReader("me/linkedin_profile.pdf")
         self.linkedin = ""
@@ -117,7 +126,7 @@ If the user is engaging in discussion, try to steer them towards getting in touc
         messages = [{"role": "system", "content": self.system_prompt()}] + history + [{"role": "user", "content": message}]
         done = False
         while not done:
-            response = self.openai.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools)
+            response = self.gemini.chat.completions.create(model="gemini-2.0-flash", messages=messages, tools=tools)
             if response.choices[0].finish_reason=="tool_calls":
                 message = response.choices[0].message
                 tool_calls = message.tool_calls
